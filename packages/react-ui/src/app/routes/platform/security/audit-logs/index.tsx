@@ -32,12 +32,39 @@ import { platformHooks } from '@/hooks/platform-hooks';
 import { platformUserHooks } from '@/hooks/platform-user-hooks';
 import { projectHooks } from '@/hooks/project-hooks';
 import { formatUtils } from '@/lib/utils';
-import {
-  ApplicationEvent,
-  ApplicationEventName,
-  summarizeApplicationEvent,
-} from '@activepieces/ee-shared';
 import { isNil } from '@activepieces/shared';
+
+type ApplicationEvent = {
+  id: string;
+  action: string;
+  userId: string;
+  userEmail: string;
+  projectId: string;
+  data: Record<string, any>;
+  created: string;
+};
+
+const ApplicationEventName = {
+  FLOW_RUN_FINISHED: 'FLOW_RUN_FINISHED',
+  FLOW_RUN_STARTED: 'FLOW_RUN_STARTED',
+  FLOW_CREATED: 'FLOW_CREATED',
+  FLOW_DELETED: 'FLOW_DELETED',
+  FLOW_UPDATED: 'FLOW_UPDATED',
+  FOLDER_CREATED: 'FOLDER_CREATED',
+  FOLDER_DELETED: 'FOLDER_DELETED',
+  FOLDER_UPDATED: 'FOLDER_UPDATED',
+  CONNECTION_DELETED: 'CONNECTION_DELETED',
+  CONNECTION_UPSERTED: 'CONNECTION_UPSERTED',
+  USER_SIGNED_UP: 'USER_SIGNED_UP',
+  USER_SIGNED_IN: 'USER_SIGNED_IN',
+  USER_PASSWORD_RESET: 'USER_PASSWORD_RESET',
+  USER_EMAIL_VERIFIED: 'USER_EMAIL_VERIFIED',
+  SIGNING_KEY_CREATED: 'SIGNING_KEY_CREATED',
+} as const;
+
+function summarizeApplicationEvent(event: ApplicationEvent): string {
+  return event.action;
+}
 
 export default function AuditLogsPage() {
   const { platform } = platformHooks.useCurrentPlatform();

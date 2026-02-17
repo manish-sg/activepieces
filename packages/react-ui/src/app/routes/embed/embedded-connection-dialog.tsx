@@ -9,14 +9,47 @@ import {
   AppConnectionWithoutSensitiveData,
   isNil,
 } from '@activepieces/shared';
-import {
-  ActivepiecesClientConnectionNameIsInvalid,
-  ActivepiecesClientConnectionPieceNotFound,
-  ActivepiecesClientEventName,
-  ActivepiecesClientShowConnectionIframe,
-  ActivepiecesNewConnectionDialogClosed,
-  NEW_CONNECTION_QUERY_PARAMS,
-} from 'ee-embed-sdk';
+const ActivepiecesClientEventName = {
+  CLIENT_NEW_CONNECTION_DIALOG_CLOSED: 'CLIENT_NEW_CONNECTION_DIALOG_CLOSED',
+  CLIENT_SHOW_CONNECTION_IFRAME: 'CLIENT_SHOW_CONNECTION_IFRAME',
+  CLIENT_CONNECTION_NAME_IS_INVALID: 'CLIENT_CONNECTION_NAME_IS_INVALID',
+  CLIENT_CONNECTION_PIECE_NOT_FOUND: 'CLIENT_CONNECTION_PIECE_NOT_FOUND',
+} as const;
+
+const NEW_CONNECTION_QUERY_PARAMS = {
+  name: 'name',
+  connectionName: 'connectionName',
+  randomId: 'randomId',
+} as const;
+
+type ActivepiecesNewConnectionDialogClosed = {
+  type: typeof ActivepiecesClientEventName.CLIENT_NEW_CONNECTION_DIALOG_CLOSED;
+  data: {
+    connection?: {
+      id: string;
+      name: string;
+    };
+  };
+};
+
+type ActivepiecesClientConnectionNameIsInvalid = {
+  type: typeof ActivepiecesClientEventName.CLIENT_CONNECTION_NAME_IS_INVALID;
+  data: {
+    error: string;
+  };
+};
+
+type ActivepiecesClientConnectionPieceNotFound = {
+  type: typeof ActivepiecesClientEventName.CLIENT_CONNECTION_PIECE_NOT_FOUND;
+  data: {
+    error: string;
+  };
+};
+
+type ActivepiecesClientShowConnectionIframe = {
+  type: typeof ActivepiecesClientEventName.CLIENT_SHOW_CONNECTION_IFRAME;
+  data: Record<string, never>;
+};
 
 import { piecesHooks } from '../../../features/pieces/lib/pieces-hooks';
 import { CreateOrEditConnectionDialogContent } from '../../connections/create-edit-connection-dialog';

@@ -1,10 +1,29 @@
 import { api } from '@/lib/api';
-import {
-  ListProjectMembersRequestQuery,
-  ProjectMemberWithUser,
-  UpdateProjectMemberRoleRequestBody,
-} from '@activepieces/ee-shared';
 import { SeekPage } from '@activepieces/shared';
+
+type ProjectMemberWithUser = {
+  id: string;
+  userId: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  projectRole: {
+    name: string;
+  };
+};
+
+type ListProjectMembersRequestQuery = {
+  projectId: string;
+  projectRoleId: string | undefined;
+  cursor: string | undefined;
+  limit: number;
+};
+
+type UpdateProjectMemberRoleRequestBody = {
+  role: string;
+};
 
 export const projectMembersApi = {
   list(request: ListProjectMembersRequestQuery) {

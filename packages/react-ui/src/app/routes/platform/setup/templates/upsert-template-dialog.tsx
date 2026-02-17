@@ -20,12 +20,21 @@ import { Label } from '@/components/ui/label';
 import { TagInput } from '@/components/ui/tag-input';
 import { templatesApi } from '@/features/templates/lib/templates-api';
 import { api } from '@/lib/api';
-import { CreateFlowTemplateRequest } from '@activepieces/ee-shared';
 import {
   FlowTemplate,
   FlowVersionTemplate,
   TemplateType,
 } from '@activepieces/shared';
+
+type CreateFlowTemplateRequest = {
+  template: FlowVersionTemplate;
+  type: TemplateType;
+  blogUrl: string;
+  description: string;
+  id?: string;
+  tags?: string[];
+  metadata?: Record<string, string>;
+};
 
 import { Textarea } from '../../../../../components/ui/textarea';
 

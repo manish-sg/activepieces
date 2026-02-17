@@ -1,8 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { ProjectMemberWithUser } from '@activepieces/ee-shared';
-
 import { authenticationSession } from '../../../lib/authentication-session';
+
+type ProjectMemberWithUser = {
+  id: string;
+  userId: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  projectRole: {
+    name: string;
+  };
+};
 
 import { projectMembersApi } from './project-members-api';
 

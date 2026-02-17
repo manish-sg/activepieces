@@ -1,15 +1,13 @@
 import { Writable } from 'stream'
-import { AI_USAGE_AGENT_ID_HEADER, AI_USAGE_FEATURE_HEADER, AI_USAGE_MCP_ID_HEADER, AIUsageFeature, AIUsageMetadata, SUPPORTED_AI_PROVIDERS, SupportedAIProvider } from '@activepieces/common-ai'
+import { SUPPORTED_AI_PROVIDERS, SupportedAIProvider } from '@activepieces/common-ai'
 import { exceptionHandler } from '@activepieces/server-shared'
-import { ActivepiecesError, EnginePrincipal, ErrorCode, isNil, PlatformUsageMetric, PrincipalType } from '@activepieces/shared'
+import { ActivepiecesError, EnginePrincipal, ErrorCode, isNil, PrincipalType } from '@activepieces/shared'
 import proxy from '@fastify/http-proxy'
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox'
 import { FastifyRequest } from 'fastify'
-import { platformUsageService } from '../ee/platform/platform-usage-service'
-import { projectLimitsService } from '../ee/projects/project-plan/project-plan.service'
 import { aiProviderController } from './ai-provider-controller'
 import { aiProviderService } from './ai-provider-service'
-import { StreamingParser, Usage } from './providers/types'
+import { StreamingParser } from './providers/types'
 
 export const aiProviderModule: FastifyPluginAsyncTypebox = async (app) => {
     await app.register(aiProviderController, { prefix: '/v1/ai-providers' })
@@ -87,33 +85,10 @@ export const aiProviderModule: FastifyPluginAsyncTypebox = async (app) => {
                                 return
                             }
 
-                            let usage: Usage | null
                             if (isStreaming) {
-                                const finalResponse = streamingParser.onEnd()
-                                if (!finalResponse) {
-                                    throw new Error('No final response from AI provider')
-                                }
-                                usage = aiProviderService.calculateUsage(provider, request, finalResponse)
+                                streamingParser.onEnd()
                             }
-                            else {
-                                const completeResponse = JSON.parse(buffer.toString())
-                                usage = aiProviderService.calculateUsage(provider, request, completeResponse)
-                            }
-
-                            if (usage) {
-                                const metadata = {
-                                    ...usage.metadata,
-                                    ...buildAIUsageMetadata(request.headers),
-                                }
-                                await platformUsageService(app.log).increaseAiCreditUsage({
-                                    projectId,
-                                    platformId: principal!.platform.id,
-                                    provider,
-                                    model: usage.model,
-                                    cost: usage.cost,
-                                    metadata,
-                                })
-                            }
+                            // In community edition, AI usage tracking is not available
                         }
                         catch (error) {
                             exceptionHandler.handle({
@@ -137,17 +112,7 @@ export const aiProviderModule: FastifyPluginAsyncTypebox = async (app) => {
             const provider = (request.params as { provider: string }).provider
             aiProviderService.validateRequest(provider, request)
 
-            const projectId = principal.projectId
-            const videoModelRequestCost = aiProviderService.getVideoModelCost({ provider, request })
-            const exceededLimit = await projectLimitsService(request.log).checkAICreditsExceededLimit({ projectId, requestCostBeforeFiring: videoModelRequestCost })
-            if (exceededLimit) {
-                throw new ActivepiecesError({
-                    code: ErrorCode.QUOTA_EXCEEDED,
-                    params: {
-                        metric: PlatformUsageMetric.AI_CREDITS,
-                    },
-                })
-            }
+            // In community edition, AI credit limits are not enforced
            
             const userPlatformId = principal.platform.id
             const providerConfig = getProviderConfigOrThrow(provider)
@@ -189,25 +154,6 @@ function getProviderConfigOrThrow(provider: string | undefined): SupportedAIProv
         })
     }
     return providerConfig
-}
-
-function buildAIUsageMetadata(headers: Record<string, string | string[] | undefined>): AIUsageMetadata {
-    const feature = headers[AI_USAGE_FEATURE_HEADER] as AIUsageFeature
-    const agentId = headers[AI_USAGE_AGENT_ID_HEADER] as string | undefined
-    const mcpId = headers[AI_USAGE_MCP_ID_HEADER] as string | undefined
-
-    if (!feature) {
-        return { feature: AIUsageFeature.UNKNOWN }
-    }
-
-    switch (feature) {
-        case AIUsageFeature.AGENTS:
-            return { feature: AIUsageFeature.AGENTS, agentid: agentId! }
-        case AIUsageFeature.MCP:
-            return { feature: AIUsageFeature.MCP, mcpid: mcpId! }
-        default:
-            return { feature }
-    }
 }
 
 type ModifiedFastifyRequest = FastifyRequest & { customUpstream: string, originalBody: Record<string, unknown> }

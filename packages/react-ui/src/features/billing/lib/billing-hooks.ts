@@ -5,13 +5,23 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { api } from '@/lib/api';
 import { ListAICreditsUsageRequest } from '@activepieces/common-ai';
-import {
-  ToggleAiCreditsOverageEnabledParams,
-  SetAiCreditsOverageLimitParams,
-  UpdateActiveFlowsAddonParams,
-  CreateSubscriptionParams,
-} from '@activepieces/ee-shared';
 import { ApErrorParams, ErrorCode } from '@activepieces/shared';
+
+type ToggleAiCreditsOverageEnabledParams = {
+  state: string;
+};
+
+type SetAiCreditsOverageLimitParams = {
+  limit: number;
+};
+
+type UpdateActiveFlowsAddonParams = {
+  newActiveFlowsLimit: number;
+};
+
+type CreateSubscriptionParams = {
+  newActiveFlowsLimit: number;
+};
 
 import { platformBillingApi } from './api';
 

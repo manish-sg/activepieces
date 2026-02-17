@@ -1,4 +1,3 @@
-import { ApplicationEventName } from '@activepieces/ee-shared'
 import { AppSystemProp, networkUtils } from '@activepieces/server-shared'
 import {
     ALL_PRINCIPAL_TYPES,
@@ -36,7 +35,7 @@ export const authenticationController: FastifyPluginAsyncTypebox = async (
             projectId: signUpResponse.projectId,
             ip: networkUtils.extractClientRealIp(request, system.get(AppSystemProp.CLIENT_REAL_IP_HEADER)),
         }, {
-            action: ApplicationEventName.USER_SIGNED_UP,
+            action: 'USER_SIGNED_UP',
             data: {
                 source: 'credentials',
             },

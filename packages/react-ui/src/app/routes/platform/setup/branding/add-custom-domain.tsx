@@ -22,7 +22,11 @@ import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { customDomainApi } from '@/features/platform-admin/lib/custom-domain-api';
 import { api } from '@/lib/api';
-import { CustomDomain } from '@activepieces/ee-shared';
+type CustomDomain = {
+  id: string;
+  domain: string;
+  status: string;
+};
 
 const FormSchema = Type.Object({
   domain: Type.String({

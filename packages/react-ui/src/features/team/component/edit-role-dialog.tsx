@@ -21,9 +21,20 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { projectRoleApi } from '@/features/platform-admin/lib/project-role-api';
-import { ProjectMemberWithUser } from '@activepieces/ee-shared';
-
 import { projectMembersApi } from '../lib/project-members-api';
+
+type ProjectMemberWithUser = {
+  id: string;
+  userId: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  projectRole: {
+    name: string;
+  };
+};
 
 interface EditRoleDialogProps {
   member: ProjectMemberWithUser;

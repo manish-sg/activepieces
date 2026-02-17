@@ -14,7 +14,6 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
-import { ApSubscriptionStatus } from '@activepieces/ee-shared';
 import {
   AiOverageState,
   PlatformBillingInformation,
@@ -24,6 +23,11 @@ import { billingMutations } from '../lib/billing-hooks';
 
 import { AiCreditsUsageTable } from './ai-credits-usage-table';
 import { EnableAIOverageDialog } from './enable-ai-credits-overage';
+
+const ApSubscriptionStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+} as const;
 
 interface AiCreditUsageProps {
   platformSubscription: PlatformBillingInformation;

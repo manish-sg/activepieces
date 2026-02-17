@@ -1,4 +1,5 @@
 import { typeboxResolver } from '@hookform/resolvers/typebox';
+import { Type } from '@sinclair/typebox';
 import { useMutation } from '@tanstack/react-query';
 import { t } from 'i18next';
 import { useForm } from 'react-hook-form';
@@ -28,12 +29,31 @@ import { INTERNAL_ERROR_MESSAGE, toast } from '@/components/ui/use-toast';
 import { platformHooks } from '@/hooks/platform-hooks';
 import { api } from '@/lib/api';
 import { authenticationSession } from '@/lib/authentication-session';
-import {
-  ConfigureRepoRequest,
-  GitBranchType,
-  GitRepo,
-} from '@activepieces/ee-shared';
 import { ApErrorParams, ErrorCode } from '@activepieces/shared';
+
+const GitBranchType = {
+  DEVELOPMENT: 'DEVELOPMENT',
+  PRODUCTION: 'PRODUCTION',
+} as const;
+
+type GitRepo = {
+  id: string;
+  remoteUrl: string;
+  branch: string;
+  branchType: string;
+  slug: string;
+  sshPrivateKey: string;
+  projectId: string;
+};
+
+type ConfigureRepoRequest = {
+  remoteUrl: string;
+  projectId: string;
+  branchType: string;
+  sshPrivateKey: string;
+  slug: string;
+  branch: string;
+};
 
 import { gitSyncApi } from '../lib/git-sync-api';
 import { gitSyncHooks } from '../lib/git-sync-hooks';
@@ -57,7 +77,14 @@ const ConnectGitDialog = ({ open, setOpen, showButton }: ConnectGitProps) => {
       slug: '',
       branch: '',
     },
-    resolver: typeboxResolver(ConfigureRepoRequest),
+    resolver: typeboxResolver(Type.Object({
+      remoteUrl: Type.String(),
+      projectId: Type.String(),
+      branchType: Type.String(),
+      sshPrivateKey: Type.String(),
+      slug: Type.String(),
+      branch: Type.String(),
+    })),
   });
 
   const { refetch } = gitSyncHooks.useGitSync(

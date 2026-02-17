@@ -18,8 +18,24 @@ import { DataTable, RowDataWithActions } from '@/components/ui/data-table';
 import { DataTableColumnHeader } from '@/components/ui/data-table/data-table-column-header';
 import { projectRoleApi } from '@/features/platform-admin/lib/project-role-api';
 import { platformHooks } from '@/hooks/platform-hooks';
-import { ProjectMemberWithUser } from '@activepieces/ee-shared';
 import { assertNotNullOrUndefined, isNil } from '@activepieces/shared';
+
+type ProjectMemberWithUser = {
+  id: string;
+  userId: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  projectRole: {
+    name: string;
+  };
+  project: {
+    id: string;
+    displayName: string;
+  };
+};
 
 export const ProjectRoleUsersTable = () => {
   const { platform } = platformHooks.useCurrentPlatform();

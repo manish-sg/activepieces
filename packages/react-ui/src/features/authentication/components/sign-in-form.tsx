@@ -16,7 +16,6 @@ import { authenticationApi } from '@/lib/authentication-api';
 import { authenticationSession } from '@/lib/authentication-session';
 import { useRedirectAfterLogin } from '@/lib/navigation-utils';
 import { formatUtils } from '@/lib/utils';
-import { OtpType } from '@activepieces/ee-shared';
 import {
   ApEdition,
   ApFlagId,
@@ -206,7 +205,7 @@ const SignInForm: React.FC = () => {
         <div className="mt-4">
           <CheckEmailNote
             email={form.getValues().email}
-            type={OtpType.EMAIL_VERIFICATION}
+            type={'EMAIL_VERIFICATION'}
           />
         </div>
       )}

@@ -17,16 +17,68 @@ import {
   parentWindow,
   routesThatRequireProjectId,
 } from '@/lib/utils';
-import {
-  ActivepiecesClientAuthenticationFailed,
-  ActivepiecesClientAuthenticationSuccess,
-  ActivepiecesClientConfigurationFinished,
-  ActivepiecesClientEventName,
-  ActivepiecesClientInit,
-  ActivepiecesVendorEventName,
-  ActivepiecesVendorInit,
-  ActivepiecesVendorRouteChanged,
-} from 'ee-embed-sdk';
+const ActivepiecesClientEventName = {
+  CLIENT_INIT: 'CLIENT_INIT',
+  CLIENT_AUTHENTICATION_SUCCESS: 'CLIENT_AUTHENTICATION_SUCCESS',
+  CLIENT_AUTHENTICATION_FAILED: 'CLIENT_AUTHENTICATION_FAILED',
+  CLIENT_CONFIGURATION_FINISHED: 'CLIENT_CONFIGURATION_FINISHED',
+  CLIENT_ROUTE_CHANGED: 'CLIENT_ROUTE_CHANGED',
+} as const;
+
+const ActivepiecesVendorEventName = {
+  VENDOR_INIT: 'VENDOR_INIT',
+  VENDOR_ROUTE_CHANGED: 'VENDOR_ROUTE_CHANGED',
+} as const;
+
+type ActivepiecesClientInit = {
+  type: typeof ActivepiecesClientEventName.CLIENT_INIT;
+  data: Record<string, never>;
+};
+
+type ActivepiecesClientAuthenticationSuccess = {
+  type: typeof ActivepiecesClientEventName.CLIENT_AUTHENTICATION_SUCCESS;
+  data: Record<string, never>;
+};
+
+type ActivepiecesClientAuthenticationFailed = {
+  type: typeof ActivepiecesClientEventName.CLIENT_AUTHENTICATION_FAILED;
+  data: any;
+};
+
+type ActivepiecesClientConfigurationFinished = {
+  type: typeof ActivepiecesClientEventName.CLIENT_CONFIGURATION_FINISHED;
+  data: Record<string, never>;
+};
+
+type ActivepiecesVendorInit = {
+  type: typeof ActivepiecesVendorEventName.VENDOR_INIT;
+  data: {
+    jwtToken?: string;
+    initialRoute?: string;
+    hideSidebar?: boolean;
+    hideFlowNameInBuilder?: boolean;
+    disableNavigationInBuilder?: boolean | 'keep_home_button_only';
+    hideFolders?: boolean;
+    sdkVersion?: string;
+    fontUrl?: string;
+    fontFamily?: string;
+    hideExportAndImportFlow?: boolean;
+    emitHomeButtonClickedEvent?: boolean;
+    homeButtonIcon?: string;
+    hideDuplicateFlow?: boolean;
+    hideFlowsPageNavbar?: boolean;
+    hidePageHeader?: boolean;
+    mode?: string;
+    locale?: string;
+  };
+};
+
+type ActivepiecesVendorRouteChanged = {
+  type: typeof ActivepiecesVendorEventName.VENDOR_ROUTE_CHANGED;
+  data: {
+    vendorRoute: string;
+  };
+};
 
 const notifyVendorPostAuthentication = () => {
   const authenticationSuccessEvent: ActivepiecesClientAuthenticationSuccess = {

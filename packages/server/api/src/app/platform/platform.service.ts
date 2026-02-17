@@ -1,7 +1,5 @@
-import { OPEN_SOURCE_PLAN } from '@activepieces/ee-shared'
 import {
     ActivepiecesError,
-    ApEdition,
     apId,
     ErrorCode,
     FilteredPieceBehavior,
@@ -9,7 +7,6 @@ import {
     Platform,
     PlatformId,
     PlatformPlanLimits,
-    PlatformUsage,
     PlatformWithoutSensitiveData,
     spreadIfDefined,
     UpdatePlatformRequestBody,
@@ -17,10 +14,7 @@ import {
     UserStatus,
 } from '@activepieces/shared'
 import { repoFactory } from '../core/db/repo-factory'
-import { platformPlanService } from '../ee/platform/platform-plan/platform-plan.service'
-import { platformUsageService } from '../ee/platform/platform-usage-service'
 import { defaultTheme } from '../flags/theme'
-import { system } from '../helper/system/system'
 import { projectService } from '../project/project-service'
 import { userService } from '../user/user-service'
 import { PlatformEntity } from './platform.entity'
@@ -118,12 +112,6 @@ export const platformService = {
             ...spreadIfDefined('pinnedPieces', params.pinnedPieces),
             smtp: params.smtp,
         }
-        if (!isNil(params.plan)) {
-            await platformPlanService(system.globalLogger()).update({
-                platformId: params.id,
-                ...params.plan,
-            })
-        }
         return platformRepo().save(updatedPlatform)
     },
     async getOneOrThrow(id: PlatformId): Promise<Platform> {
@@ -151,23 +139,23 @@ export const platformService = {
         }
         return {
             ...platform,
-            usage: await getUsage(platform),
-            plan: await getPlan(platform),
+            usage: undefined,
+            plan: getDefaultPlan(),
         }
     },
     async getOneWithPlanOrThrow(id: PlatformId): Promise<Omit<PlatformWithoutSensitiveData, 'usage'>> {
         const platform = await this.getOneOrThrow(id)
         return {
             ...platform,
-            plan: await getPlan(platform),
+            plan: getDefaultPlan(),
         }
     },
     async getOneWithPlanAndUsageOrThrow(id: PlatformId): Promise<PlatformWithoutSensitiveData> {
         const platform = await this.getOneOrThrow(id)
         return {
             ...platform,
-            usage: await getUsage(platform),
-            plan: await getPlan(platform),
+            usage: undefined,
+            plan: getDefaultPlan(),
         }
     },
     async getOne(id: PlatformId): Promise<Platform | null> {
@@ -177,24 +165,34 @@ export const platformService = {
     },
 }
 
-async function getUsage(platform: Platform): Promise<PlatformUsage | undefined> {
-    const edition = system.getEdition()
-    if (edition === ApEdition.COMMUNITY) {
-        return undefined
+function getDefaultPlan(): PlatformPlanLimits {
+    return {
+        environmentsEnabled: true,
+        analyticsEnabled: true,
+        showPoweredBy: false,
+        agentsEnabled: true,
+        mcpsEnabled: true,
+        tablesEnabled: true,
+        todosEnabled: true,
+        auditLogEnabled: true,
+        embeddingEnabled: true,
+        managePiecesEnabled: true,
+        manageTemplatesEnabled: true,
+        customAppearanceEnabled: true,
+        manageProjectsEnabled: true,
+        projectRolesEnabled: true,
+        customDomainsEnabled: true,
+        globalConnectionsEnabled: true,
+        customRolesEnabled: true,
+        apiKeysEnabled: true,
+        ssoEnabled: true,
+        includedAiCredits: 0,
+        projectsLimit: null,
+        activeFlowsLimit: null,
+        dedicatedWorkers: null,
+        stripeSubscriptionStartDate: 0,
+        stripeSubscriptionEndDate: 0,
     }
-    return platformUsageService(system.globalLogger()).getAllPlatformUsage(platform.id)
-}
-
-async function getPlan(platform: Platform): Promise<PlatformPlanLimits> {
-    const edition = system.getEdition()
-    if (edition === ApEdition.COMMUNITY) {
-        return {
-            ...OPEN_SOURCE_PLAN,
-            stripeSubscriptionStartDate: 0,
-            stripeSubscriptionEndDate: 0,
-        }
-    }
-    return platformPlanService(system.globalLogger()).getOrCreateForPlatform(platform.id)
 }
 
 type AddParams = {
@@ -210,7 +208,6 @@ type NewPlatform = Omit<Platform, 'created' | 'updated'>
 
 type UpdateParams = UpdatePlatformRequestBody & {
     id: PlatformId
-    plan?: Partial<PlatformPlanLimits>
 }
 
 type ListPlatformsForIdentityParams = {

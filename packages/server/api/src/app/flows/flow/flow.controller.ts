@@ -1,5 +1,3 @@
-
-import { ApplicationEventName, GitPushOperationType } from '@activepieces/ee-shared'
 import {
     ActivepiecesError,
     ApId,
@@ -31,9 +29,6 @@ import dayjs from 'dayjs'
 import { StatusCodes } from 'http-status-codes'
 import { authenticationUtils } from '../../authentication/authentication-utils'
 import { entitiesMustBeOwnedByCurrentProject } from '../../authentication/authorization'
-import { assertUserHasPermissionToFlow } from '../../ee/authentication/project-role/rbac-middleware'
-import { platformPlanService } from '../../ee/platform/platform-plan/platform-plan.service'
-import { gitRepoService } from '../../ee/projects/project-release/git-sync/git-sync.service'
 import { eventsHooks } from '../../helper/application-events'
 import { migrateFlowVersionTemplate } from '../flow-version/migrations'
 import { flowService } from './flow.service'
@@ -49,7 +44,7 @@ export const flowController: FastifyPluginAsyncTypebox = async (app) => {
         })
 
         eventsHooks.get(request.log).sendUserEventFromRequest(request, {
-            action: ApplicationEventName.FLOW_CREATED,
+            action: 'FLOW_CREATED',
             data: {
                 flow: newFlow,
             },
@@ -84,24 +79,15 @@ export const flowController: FastifyPluginAsyncTypebox = async (app) => {
         },
     }, async (request) => {
         const userId = await authenticationUtils.extractUserIdFromPrincipal(request.principal)
-        await assertUserHasPermissionToFlow(request.principal, request.body.type, request.log)
 
         const flow = await flowService(request.log).getOnePopulatedOrThrow({
             id: request.params.id,
             projectId: request.principal.projectId,
         })
 
-        const turnOnFlow = request.body.type === FlowOperationType.CHANGE_STATUS && request.body.request.status === FlowStatus.ENABLED
-        const publishDisabledFlow = request.body.type === FlowOperationType.LOCK_AND_PUBLISH && flow.status === FlowStatus.DISABLED
-        if (turnOnFlow || publishDisabledFlow) {
-            await platformPlanService(request.log).checkActiveFlowsExceededLimit(
-                request.principal.platform.id,
-                PlatformUsageMetric.ACTIVE_FLOWS,
-            )
-        }
         await assertThatFlowIsNotBeingUsed(flow, userId)
         eventsHooks.get(request.log).sendUserEventFromRequest(request, {
-            action: ApplicationEventName.FLOW_UPDATED,
+            action: 'FLOW_UPDATED',
             data: {
                 request: request.body,
                 flowVersion: flow.version,
@@ -162,19 +148,11 @@ export const flowController: FastifyPluginAsyncTypebox = async (app) => {
             projectId: request.principal.projectId,
         })
         eventsHooks.get(request.log).sendUserEventFromRequest(request, {
-            action: ApplicationEventName.FLOW_DELETED,
+            action: 'FLOW_DELETED',
             data: {
                 flow,
                 flowVersion: flow.version,
             },
-        })
-        await gitRepoService(request.log).onDeleted({
-            type: GitPushOperationType.DELETE_FLOW,
-            externalId: flow.externalId,
-            userId: request.principal.id,
-            projectId: request.principal.projectId,
-            platformId: request.principal.platform.id,
-            log: request.log,
         })
         await flowService(request.log).delete({
             id: request.params.id,

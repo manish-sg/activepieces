@@ -13,8 +13,6 @@ import { Socket } from 'socket.io'
 import { In } from 'typeorm'
 import { repoFactory } from '../../core/db/repo-factory'
 import { redisConnections } from '../../database/redis-connections'
-import { domainHelper } from '../../ee/custom-domains/domain-helper'
-import { dedicatedWorkers } from '../../ee/platform/platform-plan/platform-dedicated-workers'
 import { jwtUtils } from '../../helper/jwt-utils'
 import { system } from '../../helper/system/system'
 import { WorkerMachineEntity } from './machine-entity'
@@ -54,9 +52,7 @@ export const machineService = (_log: FastifyBaseLogger) => {
                 LOKI_URL: system.get(AppSystemProp.LOKI_URL),
                 LOKI_USERNAME: system.get(AppSystemProp.LOKI_USERNAME),
                 OTEL_ENABLED: system.get(AppSystemProp.OTEL_ENABLED) === 'true',
-                PUBLIC_URL: await domainHelper.getPublicUrl({
-                    path: '',
-                }),
+                PUBLIC_URL: system.getOrThrow(AppSystemProp.FRONTEND_URL),
                 PROJECT_RATE_LIMITER_ENABLED: isDedicatedWorker ? false : system.getBooleanOrThrow(AppSystemProp.PROJECT_RATE_LIMITER_ENABLED),
                 MAX_CONCURRENT_JOBS_PER_PROJECT: system.getNumberOrThrow(AppSystemProp.MAX_CONCURRENT_JOBS_PER_PROJECT),
                 FILE_STORAGE_LOCATION: system.getOrThrow(AppSystemProp.FILE_STORAGE_LOCATION),
@@ -126,20 +122,8 @@ export const machineService = (_log: FastifyBaseLogger) => {
 }
 
 
-async function getExecutionMode(log: FastifyBaseLogger, platformIdForDedicatedWorker: string | undefined): Promise<ExecutionMode> {
-    const executionMode = system.getOrThrow<ExecutionMode>(AppSystemProp.EXECUTION_MODE)
-    if (isNil(platformIdForDedicatedWorker)) {
-        return executionMode
-    }
-
-    const dedicatedWorkerConfig = await dedicatedWorkers(log).getWorkerConfig(platformIdForDedicatedWorker)
-    if (isNil(dedicatedWorkerConfig)) {
-        return executionMode
-    }
-    if (dedicatedWorkerConfig.trustedEnvironment) {
-        return ExecutionMode.SANDBOX_PROCESS
-    }
-    return ExecutionMode.SANDBOX_CODE_AND_PROCESS
+async function getExecutionMode(_log: FastifyBaseLogger, _platformIdForDedicatedWorker: string | undefined): Promise<ExecutionMode> {
+    return system.getOrThrow<ExecutionMode>(AppSystemProp.EXECUTION_MODE)
 }
 
 type OnDisconnectParams = {

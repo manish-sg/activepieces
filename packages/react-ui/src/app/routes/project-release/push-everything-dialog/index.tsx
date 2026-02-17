@@ -1,4 +1,5 @@
 import { typeboxResolver } from '@hookform/resolvers/typebox';
+import { Type } from '@sinclair/typebox';
 import { useMutation } from '@tanstack/react-query';
 import { t } from 'i18next';
 import { Info } from 'lucide-react';
@@ -32,13 +33,28 @@ import { gitSyncApi } from '@/features/git-sync/lib/git-sync-api';
 import { gitSyncHooks } from '@/features/git-sync/lib/git-sync-hooks';
 import { platformHooks } from '@/hooks/platform-hooks';
 import { authenticationSession } from '@/lib/authentication-session';
-import {
-  GitBranchType,
-  GitPushOperationType,
-  PushEverythingGitRepoRequest,
-  PushGitRepoRequest,
-} from '@activepieces/ee-shared';
 import { assertNotNullOrUndefined } from '@activepieces/shared';
+
+const GitBranchType = {
+  DEVELOPMENT: 'DEVELOPMENT',
+  PRODUCTION: 'PRODUCTION',
+} as const;
+
+const GitPushOperationType = {
+  PUSH_EVERYTHING: 'PUSH_EVERYTHING',
+  PUSH_FLOW: 'PUSH_FLOW',
+  PUSH_TABLE: 'PUSH_TABLE',
+} as const;
+
+type PushGitRepoRequest = {
+  type: string;
+  commitMessage: string;
+};
+
+const PushEverythingGitRepoRequest = Type.Object({
+  type: Type.String(),
+  commitMessage: Type.String(),
+});
 
 type PushEverythingDialogProps = {
   children?: React.ReactNode;

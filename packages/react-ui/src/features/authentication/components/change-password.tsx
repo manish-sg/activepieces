@@ -22,7 +22,11 @@ import { PasswordValidator } from '@/features/authentication/components/password
 import { passwordValidation } from '@/features/authentication/lib/password-validation-utils';
 import { HttpError } from '@/lib/api';
 import { authenticationApi } from '@/lib/authentication-api';
-import { ResetPasswordRequestBody } from '@activepieces/ee-shared';
+type ResetPasswordRequestBody = {
+  otp: string;
+  identityId: string;
+  newPassword: string;
+};
 
 const ChangePasswordForm = () => {
   const navigate = useNavigate();

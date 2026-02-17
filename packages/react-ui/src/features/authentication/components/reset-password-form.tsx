@@ -20,13 +20,21 @@ import { Label } from '@/components/ui/label';
 import { CheckEmailNote } from '@/features/authentication/components/check-email-note';
 import { HttpError } from '@/lib/api';
 import { authenticationApi } from '@/lib/authentication-api';
-import { CreateOtpRequestBody, OtpType } from '@activepieces/ee-shared';
+const OtpType = {
+  EMAIL_VERIFICATION: 'EMAIL_VERIFICATION',
+  PASSWORD_RESET: 'PASSWORD_RESET',
+} as const;
+
+type CreateOtpRequestBody = {
+  email: string;
+  type: string;
+};
 
 const FormSchema = Type.Object({
   email: Type.String({
     errorMessage: t('Please enter your email'),
   }),
-  type: Type.Enum(OtpType),
+  type: Type.String(),
 });
 
 type FormSchema = Static<typeof FormSchema>;

@@ -14,7 +14,6 @@ import { gitSyncHooks } from '@/features/git-sync/lib/git-sync-hooks';
 import { useAuthorization } from '@/hooks/authorization-hooks';
 import { platformHooks } from '@/hooks/platform-hooks';
 import { authenticationSession } from '@/lib/authentication-session';
-import { GitBranchType } from '@activepieces/ee-shared';
 import {
   FlowVersionState,
   Permission,
@@ -63,7 +62,7 @@ export const useFlowsBulkActions = ({
     platform.plan.environmentsEnabled,
   );
   const isDevelopmentBranch =
-    gitSync && gitSync.branchType === GitBranchType.DEVELOPMENT;
+    gitSync && gitSync.branchType === 'DEVELOPMENT';
   const { mutate: exportFlows, isPending: isExportPending } =
     flowsHooks.useExportFlows();
   return useMemo(() => {

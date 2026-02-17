@@ -16,7 +16,11 @@ import { NewSigningKeyDialog } from '@/features/platform-admin/components/new-si
 import { signingKeyApi } from '@/features/platform-admin/lib/signing-key-api';
 import { platformHooks } from '@/hooks/platform-hooks';
 import { formatUtils } from '@/lib/utils';
-import { SigningKey } from '@activepieces/ee-shared';
+type SigningKey = {
+  id: string;
+  displayName: string;
+  created: string;
+};
 
 const SigningKeysPage = () => {
   const { data, isLoading, refetch } = useQuery({

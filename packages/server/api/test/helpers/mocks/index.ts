@@ -1,20 +1,4 @@
 import { AIProvider } from '@activepieces/common-ai'
-import {
-    ApiKey,
-    ApplicationEvent,
-    ApplicationEventName,
-    CustomDomain,
-    CustomDomainStatus,
-    GitBranchType,
-    GitRepo,
-    KeyAlgorithm,
-    OAuthApp,
-    OtpModel,
-    OtpState,
-    OtpType,
-    ProjectMember,
-    SigningKey,
-} from '@activepieces/ee-shared'
 import { apDayjs } from '@activepieces/server-shared'
 import {
     AiOverageState,
@@ -69,15 +53,144 @@ import {
 import { faker } from '@faker-js/faker'
 import bcrypt from 'bcrypt'
 import dayjs from 'dayjs'
+import crypto from 'crypto'
 import { AIProviderSchema } from '../../../src/app/ai/ai-provider-entity'
 import { databaseConnection } from '../../../src/app/database/database-connection'
-import { generateApiKey } from '../../../src/app/ee/api-keys/api-key-service'
-import { OAuthAppWithEncryptedSecret } from '../../../src/app/ee/oauth-apps/oauth-app.entity'
-import { PlatformPlanEntity } from '../../../src/app/ee/platform/platform-plan/platform-plan.entity'
 import { encryptUtils } from '../../../src/app/helper/encryption'
 import { PieceMetadataSchema } from '../../../src/app/pieces/metadata/piece-metadata-entity'
 import { PieceTagSchema } from '../../../src/app/pieces/tags/pieces/piece-tag.entity'
 import { TagEntitySchema } from '../../../src/app/pieces/tags/tag-entity'
+
+// Inline types for removed ee-shared imports
+type ApiKey = {
+    id: string
+    created: string
+    updated: string
+    displayName: string
+    platformId: string
+    hashedValue: string
+    truncatedValue: string
+}
+
+type ApplicationEvent = {
+    id?: string
+    created?: string
+    updated?: string
+    ip?: string
+    platformId?: string
+    userId?: string
+    userEmail?: string
+    action?: string
+    data?: Record<string, unknown>
+}
+
+type ApplicationEventName = string
+
+type CustomDomain = {
+    id: string
+    created: string
+    updated: string
+    domain: string
+    platformId: string
+    status: string
+}
+
+enum CustomDomainStatus {
+    ACTIVE = 'ACTIVE',
+    PENDING = 'PENDING',
+}
+
+enum GitBranchType {
+    PRODUCTION = 'PRODUCTION',
+    DEVELOPMENT = 'DEVELOPMENT',
+}
+
+type GitRepo = {
+    id: string
+    created: string
+    updated: string
+    projectId: string
+    remoteUrl: string
+    sshPrivateKey: string
+    branch: string
+    slug: string
+    branchType: string
+}
+
+enum KeyAlgorithm {
+    RSA = 'RSA',
+}
+
+type OAuthApp = {
+    id?: string
+    created?: string
+    updated?: string
+    platformId?: string
+    pieceName?: string
+    clientId?: string
+    clientSecret?: string
+}
+
+type OtpModel = {
+    id: string
+    created: string
+    updated: string
+    type: string
+    identityId: string
+    value: string
+    state: string
+}
+
+enum OtpState {
+    PENDING = 'PENDING',
+    CONFIRMED = 'CONFIRMED',
+}
+
+enum OtpType {
+    EMAIL_VERIFICATION = 'EMAIL_VERIFICATION',
+    PASSWORD_RESET = 'PASSWORD_RESET',
+}
+
+type ProjectMember = {
+    id: string
+    created: string
+    updated: string
+    platformId: string
+    projectRoleId: string
+    userId: string
+    projectId: string
+}
+
+type SigningKey = {
+    id: string
+    created: string
+    updated: string
+    displayName: string
+    platformId: string
+    publicKey: string
+    algorithm: string
+}
+
+type OAuthAppWithEncryptedSecret = {
+    id: string
+    created: string
+    updated: string
+    platformId: string
+    pieceName: string
+    clientId: string
+    clientSecret: string
+}
+
+type PlatformPlanEntity = {
+    platformId: string
+}
+
+function generateApiKey(): { secretHashed: string, secretTruncated: string, secret: string } {
+    const secret = `sk-${apId()}`
+    const secretTruncated = secret.slice(0, 8)
+    const secretHashed = crypto.createHash('sha256').update(secret).digest('hex')
+    return { secretHashed, secretTruncated, secret }
+}
 
 export const CLOUD_PLATFORM_ID = 'cloud-id'
 
@@ -670,8 +783,8 @@ export const mockAndSaveBasicSetup = async (params?: MockBasicSetupParams): Prom
     })
     
     await databaseConnection().getRepository('platform').save(mockPlatform)
-    const hasPlanTable = databaseConnection().hasMetadata(PlatformPlanEntity)
-    if (hasPlanTable) {
+    // In community edition, platform plan table may not exist
+    try {
         const mockPlatformPlan = createMockPlatformPlan({
             platformId: mockPlatform.id,
             auditLogEnabled: true,
@@ -683,6 +796,9 @@ export const mockAndSaveBasicSetup = async (params?: MockBasicSetupParams): Prom
             ...params?.plan,
         })
         await databaseConnection().getRepository('platform_plan').upsert(mockPlatformPlan, ['platformId'])
+    }
+    catch {
+        // Platform plan table doesn't exist in community edition
     }
 
     mockOwner.platformId = mockPlatform.id

@@ -23,9 +23,10 @@ import { FastifyBaseLogger } from 'fastify'
 import { StatusCodes } from 'http-status-codes'
 import { EngineHelperResponse } from 'server-worker'
 import { z } from 'zod'
+import { AppSystemProp } from '@activepieces/server-shared'
 import { accessTokenManager } from '../../authentication/lib/access-token-manager'
-import { domainHelper } from '../../ee/custom-domains/domain-helper'
 import { flowService } from '../../flows/flow/flow.service'
+import { system } from '../../helper/system/system'
 import { telemetry } from '../../helper/telemetry.utils'
 import { pieceMetadataService } from '../../pieces/metadata/piece-metadata-service'
 import { projectService } from '../../project/project-service'
@@ -73,10 +74,7 @@ async function initializeOpenAIModel({
     mcpId: string
 }): Promise<LanguageModelV2> {
     const model = 'gpt-4.1'
-    const baseURL = await domainHelper.getPublicApiUrl({
-        path: '/v1/ai-providers/proxy/openai',
-        platformId,
-    })
+    const baseURL = `${system.getOrThrow(AppSystemProp.FRONTEND_URL)}/v1/ai-providers/proxy/openai`
 
     const engineToken = await accessTokenManager.generateEngineToken({
         platformId,

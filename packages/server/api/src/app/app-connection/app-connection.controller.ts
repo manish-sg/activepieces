@@ -1,4 +1,3 @@
-import { ApplicationEventName } from '@activepieces/ee-shared'
 import {
     ApId,
     AppConnectionOwners,
@@ -38,7 +37,7 @@ export const appConnectionController: FastifyPluginCallbackTypebox = (app, _opts
             metadata: request.body.metadata,
         })
         eventsHooks.get(request.log).sendUserEventFromRequest(request, {
-            action: ApplicationEventName.CONNECTION_UPSERTED,
+            action: 'CONNECTION_UPSERTED',
             data: {
                 connection: appConnection,
             },
@@ -117,7 +116,7 @@ export const appConnectionController: FastifyPluginCallbackTypebox = (app, _opts
             projectId: request.principal.projectId,
         })
         eventsHooks.get(request.log).sendUserEventFromRequest(request, {
-            action: ApplicationEventName.CONNECTION_DELETED,
+            action: 'CONNECTION_DELETED',
             data: {
                 connection,
             },

@@ -1,10 +1,22 @@
 import { api } from '@/lib/api';
-import {
-  ApiKeyResponseWithoutValue,
-  ApiKeyResponseWithValue,
-  CreateApiKeyRequest,
-} from '@activepieces/ee-shared';
 import { SeekPage } from '@activepieces/shared';
+
+type ApiKeyResponseWithoutValue = {
+  id: string;
+  displayName: string;
+  created: string;
+  lastUsedAt: string | null;
+};
+
+type ApiKeyResponseWithValue = {
+  id: string;
+  displayName: string;
+  value: string;
+};
+
+type CreateApiKeyRequest = {
+  displayName: string;
+};
 
 export const apiKeyApi = {
   list() {

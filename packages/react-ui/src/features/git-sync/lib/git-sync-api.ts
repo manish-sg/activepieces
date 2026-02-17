@@ -1,10 +1,31 @@
 import { api } from '@/lib/api';
-import {
-  ConfigureRepoRequest,
-  GitRepo,
-  PushGitRepoRequest,
-} from '@activepieces/ee-shared';
 import { SeekPage } from '@activepieces/shared';
+
+type GitRepo = {
+  id: string;
+  remoteUrl: string;
+  branch: string;
+  branchType: string;
+  slug: string;
+  sshPrivateKey: string;
+  projectId: string;
+};
+
+type ConfigureRepoRequest = {
+  remoteUrl: string;
+  projectId: string;
+  branchType: string;
+  sshPrivateKey: string;
+  slug: string;
+  branch: string;
+};
+
+type PushGitRepoRequest = {
+  type: string;
+  commitMessage: string;
+  externalFlowIds?: string[];
+  externalTableIds?: string[];
+};
 
 export const gitSyncApi = {
   async get(projectId: string): Promise<GitRepo | null> {

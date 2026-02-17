@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom';
 
 import { flagsHooks } from '@/hooks/flags-hooks';
 import { authenticationSession } from '@/lib/authentication-session';
-import { ActivepiecesClientEventName } from 'ee-embed-sdk';
-
 import { useEmbedding } from '../embed-provider';
+
+const ActivepiecesClientEventName = {
+  CLIENT_BUILDER_HOME_BUTTON_CLICKED: 'CLIENT_BUILDER_HOME_BUTTON_CLICKED',
+} as const;
 
 import { Button } from './button';
 import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';

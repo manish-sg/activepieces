@@ -1,5 +1,4 @@
 import { PieceCategory, PieceOrderBy, PieceSortBy, PlatformId, SuggestionType } from '@activepieces/shared'
-import { enterpriseFilteringUtils } from '../../../ee/pieces/filters/piece-filtering-utils'
 import { PieceMetadataSchema } from '../piece-metadata-entity'
 import { pieceSearching } from './piece-searching'
 import { pieceSorting } from './piece-sorting'
@@ -12,18 +11,11 @@ export const pieceListUtils = {
             params.pieces,
         )
 
-        const userBasedPieces = pieceSearching.search({
+        return pieceSearching.search({
             categories: params.categories,
             searchQuery: params.searchQuery,
             pieces: sortedPieces,
             suggestionType: params.suggestionType,
-        })
-
-        return enterpriseFilteringUtils.filter({
-            pieces: userBasedPieces,
-            includeHidden: params.includeHidden,
-            platformId: params.platformId,
-            projectId: params.projectId,
         })
     },
 }

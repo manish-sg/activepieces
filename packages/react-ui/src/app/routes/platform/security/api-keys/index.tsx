@@ -14,7 +14,12 @@ import { INTERNAL_ERROR_TOAST, toast } from '@/components/ui/use-toast';
 import { apiKeyApi } from '@/features/platform-admin/lib/api-key-api';
 import { platformHooks } from '@/hooks/platform-hooks';
 import { formatUtils } from '@/lib/utils';
-import { ApiKeyResponseWithoutValue } from '@activepieces/ee-shared';
+type ApiKeyResponseWithoutValue = {
+  id: string;
+  displayName: string;
+  created: string;
+  lastUsedAt: string | null;
+};
 
 const ApiKeysPage = () => {
   const queryClient = useQueryClient();

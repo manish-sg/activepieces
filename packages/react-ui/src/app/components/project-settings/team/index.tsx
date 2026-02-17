@@ -12,7 +12,18 @@ import { InvitationCard } from '@/features/team/component/invitation-card';
 import { ProjectMemberCard } from '@/features/team/component/project-member-card';
 import { projectMembersHooks } from '@/features/team/lib/project-members-hooks';
 import { userInvitationsHooks } from '@/features/team/lib/user-invitations-hooks';
-import { ProjectMemberWithUser } from '@activepieces/ee-shared';
+type ProjectMemberWithUser = {
+  id: string;
+  userId: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  projectRole: {
+    name: string;
+  };
+};
 
 export const TeamSettings = () => {
   const {

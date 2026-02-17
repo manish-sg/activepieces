@@ -17,8 +17,12 @@ import {
 } from '@/features/billing/lib/billing-hooks';
 import { flagsHooks } from '@/hooks/flags-hooks';
 import { platformHooks } from '@/hooks/platform-hooks';
-import { ApSubscriptionStatus } from '@activepieces/ee-shared';
 import { ApEdition, ApFlagId, isNil, PlanName } from '@activepieces/shared';
+
+const ApSubscriptionStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+} as const;
 
 export default function Billing() {
   const { platform } = platformHooks.useCurrentPlatform();
@@ -34,7 +38,7 @@ export default function Billing() {
   const { data: edition } = flagsHooks.useFlag<ApEdition>(ApFlagId.EDITION);
   const status = platformPlanInfo?.plan?.stripeSubscriptionStatus;
   const isSubscriptionActive =
-    ApSubscriptionStatus.ACTIVE === (status as ApSubscriptionStatus);
+    ApSubscriptionStatus.ACTIVE === status;
   const isEnterprise =
     !isNil(platformPlanInfo?.plan.licenseKey) ||
     platformPlanInfo?.plan.plan === PlanName.ENTERPRISE ||

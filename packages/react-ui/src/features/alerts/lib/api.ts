@@ -1,10 +1,23 @@
 import { api } from '@/lib/api';
-import {
-  Alert,
-  CreateAlertParams,
-  ListAlertsParams,
-} from '@activepieces/ee-shared';
 import { SeekPage } from '@activepieces/shared';
+
+type Alert = {
+  id: string;
+  receiver: string;
+  projectId: string;
+  channel: string;
+};
+
+type CreateAlertParams = {
+  receiver: string;
+  projectId: string;
+  channel: string;
+};
+
+type ListAlertsParams = {
+  projectId: string;
+  limit: number;
+};
 
 export const alertsApi = {
   create(request: CreateAlertParams): Promise<Alert> {

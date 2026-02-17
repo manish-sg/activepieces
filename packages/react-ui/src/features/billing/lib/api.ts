@@ -3,13 +3,23 @@ import {
   ListAICreditsUsageRequest,
   ListAICreditsUsageResponse,
 } from '@activepieces/common-ai';
-import {
-  ToggleAiCreditsOverageEnabledParams,
-  SetAiCreditsOverageLimitParams,
-  UpdateActiveFlowsAddonParams,
-  CreateSubscriptionParams,
-} from '@activepieces/ee-shared';
 import { PlatformPlan, PlatformBillingInformation } from '@activepieces/shared';
+
+type ToggleAiCreditsOverageEnabledParams = {
+  state: string;
+};
+
+type SetAiCreditsOverageLimitParams = {
+  limit: number;
+};
+
+type UpdateActiveFlowsAddonParams = {
+  newActiveFlowsLimit: number;
+};
+
+type CreateSubscriptionParams = {
+  newActiveFlowsLimit: number;
+};
 
 export const platformBillingApi = {
   getSubscriptionInfo() {

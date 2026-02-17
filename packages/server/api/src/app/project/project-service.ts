@@ -15,10 +15,9 @@ import {
     spreadIfDefined,
     UserId,
 } from '@activepieces/shared'
-import { FindOptionsWhere, ILike, In, IsNull, Not } from 'typeorm'
+import { FindOptionsWhere, ILike, IsNull, Not } from 'typeorm'
 import { repoFactory } from '../core/db/repo-factory'
 import { distributedStore } from '../database/redis-connections'
-import { projectMemberService } from '../ee/projects/project-members/project-member.service'
 import { system } from '../helper/system/system'
 import { userService } from '../user/user-service'
 import { ProjectEntity } from './project-entity'
@@ -184,28 +183,11 @@ export const projectService = {
 
 
 async function getUsersFilters(params: GetAllForUserParams): Promise<FindOptionsWhere<Project>[]> {
-    const user = await userService.getOneOrFail({ id: params.userId })
-    const isPrivilegedUser = user.platformRole === PlatformRole.ADMIN || user.platformRole === PlatformRole.OPERATOR
     const displayNameFilter = params.displayName ? { displayName: ILike(`%${params.displayName}%`) } : {}
-    
-    if (isPrivilegedUser) {
-        // Platform admins and operators can see all projects in their platform
-        return [{
-            platformId: params.platformId,
-            ...displayNameFilter,
-        }]
-    }
-    
-    // Only fetch project memberships for non-privileged users
-    const projectIds = await projectMemberService(system.globalLogger()).getIdsOfProjects({
-        platformId: params.platformId,
-        userId: params.userId,
-    })
-    
-    // Regular members can only see projects they're members of
+
+    // In community edition, all users can see all projects in their platform
     return [{
         platformId: params.platformId,
-        id: In(projectIds),
         ...displayNameFilter,
     }]
 }

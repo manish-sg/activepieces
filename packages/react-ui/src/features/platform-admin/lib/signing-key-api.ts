@@ -1,11 +1,23 @@
 import { api } from '@/lib/api';
-import {
-  AddSigningKeyRequestBody,
-  AddSigningKeyResponse,
-  SigningKey,
-  SigningKeyId,
-} from '@activepieces/ee-shared';
 import { SeekPage } from '@activepieces/shared';
+
+type SigningKey = {
+  id: string;
+  displayName: string;
+  created: string;
+};
+
+type SigningKeyId = string;
+
+type AddSigningKeyRequestBody = {
+  displayName: string;
+};
+
+type AddSigningKeyResponse = {
+  id: string;
+  displayName: string;
+  privateKey: string;
+};
 
 export const signingKeyApi = {
   list() {

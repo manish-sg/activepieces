@@ -1,15 +1,17 @@
 import { api } from '@/lib/api';
 import { authenticationSession } from '@/lib/authentication-session';
 import {
-  CreatePlatformProjectRequest,
-  UpdateProjectPlatformRequest,
-} from '@activepieces/ee-shared';
-import {
   ListProjectRequestForUserQueryParams,
   ProjectWithLimits,
   ProjectWithLimitsWithPlatform,
   SeekPage,
 } from '@activepieces/shared';
+
+type CreatePlatformProjectRequest = {
+  displayName: string;
+};
+
+type UpdateProjectPlatformRequest = Record<string, unknown>;
 
 export const projectApi = {
   current: async () => {

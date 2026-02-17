@@ -1,10 +1,5 @@
 import { api } from '@/lib/api';
 import {
-  CreateOtpRequestBody,
-  ResetPasswordRequestBody,
-  VerifyEmailRequestBody,
-} from '@activepieces/ee-shared';
-import {
   AuthenticationResponse,
   ClaimTokenRequest,
   FederatedAuthnLoginResponse,
@@ -16,6 +11,22 @@ import {
   ThirdPartyAuthnProviderEnum,
   UserIdentity,
 } from '@activepieces/shared';
+
+type CreateOtpRequestBody = {
+  email: string;
+  type: string;
+};
+
+type ResetPasswordRequestBody = {
+  otp: string;
+  identityId: string;
+  newPassword: string;
+};
+
+type VerifyEmailRequestBody = {
+  otp: string;
+  identityId: string;
+};
 
 export const authenticationApi = {
   signIn(request: SignInRequest) {

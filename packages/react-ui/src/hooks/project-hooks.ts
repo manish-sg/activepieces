@@ -8,7 +8,6 @@ import { useEmbedding } from '@/components/embed-provider';
 import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/lib/api';
 import { authenticationSession } from '@/lib/authentication-session';
-import { UpdateProjectPlatformRequest } from '@activepieces/ee-shared';
 import {
   ApEdition,
   ApFlagId,
@@ -129,7 +128,7 @@ export const projectHooks = {
 
 const updateCurrentProject = async (
   queryClient: QueryClient,
-  request: UpdateProjectPlatformRequest,
+  request: Record<string, unknown>,
 ) => {
   const currentProjectId = authenticationSession.getProjectId();
   queryClient.setQueryData(['current-project', currentProjectId], {

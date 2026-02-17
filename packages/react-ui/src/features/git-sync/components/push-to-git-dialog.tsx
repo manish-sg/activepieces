@@ -1,4 +1,5 @@
 import { typeboxResolver } from '@hookform/resolvers/typebox';
+import { Type } from '@sinclair/typebox';
 import { useMutation } from '@tanstack/react-query';
 import { t } from 'i18next';
 import React from 'react';
@@ -25,17 +26,40 @@ import { toast } from '@/components/ui/use-toast';
 import { platformHooks } from '@/hooks/platform-hooks';
 import { authenticationSession } from '@/lib/authentication-session';
 import {
-  GitBranchType,
-  GitPushOperationType,
-  PushGitRepoRequest,
-  PushFlowsGitRepoRequest,
-  PushTablesGitRepoRequest,
-} from '@activepieces/ee-shared';
-import {
   assertNotNullOrUndefined,
   PopulatedFlow,
   Table,
 } from '@activepieces/shared';
+
+const GitBranchType = {
+  DEVELOPMENT: 'DEVELOPMENT',
+  PRODUCTION: 'PRODUCTION',
+} as const;
+
+const GitPushOperationType = {
+  PUSH_EVERYTHING: 'PUSH_EVERYTHING',
+  PUSH_FLOW: 'PUSH_FLOW',
+  PUSH_TABLE: 'PUSH_TABLE',
+} as const;
+
+type PushGitRepoRequest = {
+  type: string;
+  commitMessage: string;
+  externalFlowIds?: string[];
+  externalTableIds?: string[];
+};
+
+const PushFlowsGitRepoRequest = Type.Object({
+  type: Type.String(),
+  commitMessage: Type.String(),
+  externalFlowIds: Type.Array(Type.String()),
+});
+
+const PushTablesGitRepoRequest = Type.Object({
+  type: Type.String(),
+  commitMessage: Type.String(),
+  externalTableIds: Type.Array(Type.String()),
+});
 
 import { gitSyncApi } from '../lib/git-sync-api';
 import { gitSyncHooks } from '../lib/git-sync-hooks';

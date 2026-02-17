@@ -32,7 +32,6 @@ import { useAuthorization } from '@/hooks/authorization-hooks';
 import { platformHooks } from '@/hooks/platform-hooks';
 import { authenticationSession } from '@/lib/authentication-session';
 import { useNewWindow } from '@/lib/navigation-utils';
-import { GitBranchType } from '@activepieces/ee-shared';
 import {
   FlowOperationType,
   FlowVersion,
@@ -83,7 +82,7 @@ const FlowActionMenu: React.FC<FlowActionMenuProps> = ({
 
   const { embedState } = useEmbedding();
   const isDevelopmentBranch =
-    gitSync && gitSync.branchType === GitBranchType.DEVELOPMENT;
+    gitSync && gitSync.branchType === 'DEVELOPMENT';
   const [open, setOpen] = useState(false);
   const allowPush =
     flow.publishedVersionId !== null &&

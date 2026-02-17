@@ -6,9 +6,18 @@ import { UseFormReturn } from 'react-hook-form';
 import { INTERNAL_ERROR_TOAST, toast } from '@/components/ui/use-toast';
 import { api } from '@/lib/api';
 import { authenticationSession } from '@/lib/authentication-session';
-import { Alert, AlertChannel } from '@activepieces/ee-shared';
-
 import { alertsApi } from './api';
+
+type Alert = {
+  id: string;
+  receiver: string;
+  projectId: string;
+  channel: string;
+};
+
+const AlertChannel = {
+  EMAIL: 'EMAIL',
+} as const;
 
 type Params = {
   email: string;
